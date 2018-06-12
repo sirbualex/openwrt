@@ -1,0 +1,29 @@
+
+config system
+	option hostname 'openwrt'
+	option zonename 'America/Sao Paulo'
+	option timezone 'BRT3BRST,M10.3.0/0,M2.3.0/0'
+	option ttylogin '1'
+	option log_size '64'
+	option urandom_seed '0'
+
+config timeserver 'ntp'
+	option enabled '1'
+	option enable_server '0'
+	list server 'c.st1.ntp.br'
+	list server 'b.st1.ntp.br'
+	list server 'd.st1.ntp.br'
+	list server 'a.ntp.br'
+	list server 'a.st1.ntp.br'
+	list server 'gps.ntp.br'
+	list server 'b.ntp.br'
+	list server 'c.ntp.br'
+
+
+config led 'led_usb'
+	option name 'USB'
+	option sysfs 'tp-link:green:3g'
+	option trigger 'usbdev'
+	option interval '50'
+	option dev '1-1'
+
