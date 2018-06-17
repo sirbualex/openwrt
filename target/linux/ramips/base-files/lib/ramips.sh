@@ -463,6 +463,9 @@ ramips_board_detect() {
 	*"Timecloud")
 		name="timecloud"
 		;;
+	*"U35WF")
+ 		name="u35wf"
+ 		;;
 	*"UBNT-ERX")
 		name="ubnt-erx"
 		;;

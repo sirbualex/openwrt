@@ -427,6 +427,19 @@ define Device/tiny-ac
 endef
 TARGET_DEVICES += tiny-ac
 
+define Device/u35wf
+  DTS := U35WF
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  IMAGES += factory.bin
+  IMAGE/factory.bin := $$(IMAGE/sysupgrade.bin)
+  DEVICE_TITLE := Kimax U35WF
+  DEVICE_PACKAGES := kmod-usb-core kmod-usb2 kmod-mt76  \
+  			kmod-usb-ledtrig-usbport kmod-scsi-core kmod-usb-storage  \
+  			kmod-nls-utf8 kmod-nls-base  \
+			kmod-fs-btrfs kmod-fs-ext4 fdisk e2fsprogs btrfs-progs block-mount
+endef
+TARGET_DEVICES += u35wf
+
 define Device/dch-m225
   DTS := DCH-M225
   BLOCKSIZE := 4k
