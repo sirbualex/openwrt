@@ -1,0 +1,40 @@
+config global
+	option anon_swap '0'
+	option anon_mount '0'
+	option check_fs '0'
+	option delay_root '20'
+	option auto_swap '0'
+	option auto_mount '0'
+
+config swap 'diskswap'
+	option device '/dev/sda2'
+	option enabled '0'
+
+config mount 'jffs2'
+	option target '/overlay-boot'
+	option fstype 'jffs2'
+	option device '/dev/mtdblock6'
+	option options 'rw,sync'
+	option enabled '0'
+
+config mount 'f2fs'
+	option target '/'
+	option fstype 'f2fs'
+	option device '/dev/sda1'
+	option options 'rw,noatime,sync,background_gc=sync,nouser_xattr,fastboot'
+	option enabled '0'
+
+config mount 'data'
+	option target '/mnt/data'
+	option fstype 'btrfs'
+	option device '/dev/sda3'
+	option options 'subvol=/data,noatime,nodiratime,noacl,space_cache,degraded,discard'
+	option enabled '0'
+
+config mount 'ext4'
+	option target '/'
+	option fstype 'ext4'
+	option device '/dev/sda1'
+	option options 'rw,noatime,nodiratime,noacl,data=ordered,errors=continue'
+	option enabled '0'
+
