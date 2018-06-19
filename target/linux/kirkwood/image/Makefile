@@ -80,6 +80,24 @@ $(Device/dockstar)
   DEVICE_DTS := kirkwood-iconnect
 endef
 
+define Device/iomega_ix2_200
+  DEVICE_TITLE := Iomega StorCenter ix2-200
+  # TODO: Select Packages
+  #DEVICE_PACKAGES := kmod-mwl8k swconfig wpad-mini
+  DEVICE_DTS := kirkwood-iomega_ix2_200
+  KERNEL_SIZE := 3072k
+  FILESYSTEMS := squashfs ubifs
+  IMAGES := sysupgrade.bin factory.bin
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  KERNEL_IN_UBI := 0
+  UBINIZE_OPTS := -E 5  
+  IMAGE_SIZE := 32505856
+  IMAGE/factory.bin := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | check-size $$$$(IMAGE_SIZE)
+  BOARD_NAME := iomega_ix2_200
+  SUPPORTED_DEVICES += iomega_ix2_200
+endef
+TARGET_DEVICES += iomega_ix2_200
+
 define Device/pogo_e02
 $(Device/dockstar)
   DEVICE_TITLE := Cloud Engines Pogoplug E02

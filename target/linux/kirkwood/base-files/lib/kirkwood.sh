@@ -28,6 +28,10 @@ kirkwood_board_detect() {
 	"Iomega Iconnect")
 		name="iconnect"
 		;;
+		
+	"Iomega StorCenter ix2-200")
+		name="iomega_ix2_200"
+		;;
 
 	"RaidSonic ICY BOX IB-NAS62x0 (Rev B)")
 		name="ib62x0"

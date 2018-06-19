@@ -38,6 +38,11 @@ case "$board" in
 "guruplug-server-plus")
 	ucidef_set_led_timer "health" "health" "guruplug:red:health" "200" "800"
 	;;
+"iomega_ix2_200")
+	ucidef_set_led_default "power" "power" "status:white:power_led" "1"
+	ucidef_set_led_timer "health" "health" "status:white:rebuild_led" "200" "800"
+	ucidef_set_led_default "fault" "fault" "status:red:health_led" "1"
+	;;
 "sheevaplug" | \
 "sheevaplug-esata")
 	ucidef_set_led_timer "health" "health" "sheevaplug:blue:health" "200" "800"

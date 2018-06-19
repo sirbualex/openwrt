@@ -1,0 +1,32 @@
+--- a/arch/arm/boot/dts/kirkwood-iomega_ix2_200.dts
++++ b/arch/arm/boot/dts/kirkwood-iomega_ix2_200.dts
+@@ -179,23 +179,23 @@
+ 	status = "okay";
+ 
+ 	partition@0 {
+-		label = "uboot";
+-		reg = <0x0000000 0x100000>;
++		label = "u-boot";
++		reg = <0x0000000 0x100000>;
+ 	};
+ 
+	partition@a0000 {
+-		label = "env";
+-		reg = <0xa0000 0x20000>;
++		label = "u-boot environment";
++		reg = <0xa0000 0x20000>;
+ 	};
+ 
+ 	partition@100000 {
+		label = "uImage";
+		reg = <0x100000 0x300000>;
+ 	};
+ 
+	partition@400000 {
+-		label = "rootfs";
+-		reg = <0x400000 0x1C00000>;
++		label = "ubi";
++		reg = <0x400000 0x1C00000>;
+ 	};
+ };
+ 
