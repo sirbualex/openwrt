@@ -20,7 +20,7 @@ get_status_led() {
 	linksys-viper)
 		status_led="viper:white:health"
 		;;
-	iomega_ix2_200)
+	iomega_ix2_200|iom,ix2-200)
 		status_led="status:white:power_led"
 		;;
 	esac

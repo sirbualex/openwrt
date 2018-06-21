@@ -29,7 +29,7 @@ case "$board" in
 		"0:lan" "1:lan" "2:lan" "3:lan" "4:wan" "5@eth0" "6@eth1"
 	;;
 "guruplug-server-plus"|\
-"iomega_ix2_200")
+"iomega_ix2_200"|"iom,ix2-200")
 	ucidef_set_interface_lan "eth0 eth1" "dhcp"
 	;;
 *)

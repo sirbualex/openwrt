@@ -20,7 +20,8 @@ ib62x0|\
 linksys-viper|\
 pogo_e02|\
 sheevaplug|\
-sheevaplug-esata)
+sheevaplug-esata|\
+iomega_ix2_200|iom,ix2-200)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x20000" "0x20000"
 	;;
 linksys-audi)
