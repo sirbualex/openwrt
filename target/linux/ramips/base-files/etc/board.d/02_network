@@ -173,11 +173,14 @@ ramips_setup_interfaces()
 			"1:lan" "2:lan" "3:lan" "4:lan" "0:wan" "9@eth0"
 		;;
 	cf-wr800n|\
-	ex2700|\
-	u35wf)
+	ex2700)
 		ucidef_add_switch "switch0" \
 			"4:lan" "6t@eth0"
 		;;
+	u35wf)
+		ucidef_set_interface_lan "eth0"
+		ucidef_add_switch "switch0" "4:lan" "6@eth0"
+		;;		
 	cy-swr1100)
 		ucidef_add_switch "switch0" \
 			"0:lan" "1:lan" "2:lan" "3:lan" "4:wan" "9@eth0"

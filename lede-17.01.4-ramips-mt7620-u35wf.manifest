@@ -57,6 +57,7 @@ kmod-rt2x00-mmio - 4.4.92+2017-01-31-3
 kmod-rt2x00-pci - 4.4.92+2017-01-31-3
 kmod-scsi-core - 4.4.92-1
 kmod-usb-core - 4.4.92-1
+kmod-usb-ledtrig-usbport - 4.4.92-1
 kmod-usb-ohci - 4.4.92-1
 kmod-usb-storage - 4.4.92-1
 kmod-usb-uhci - 4.4.92-1
@@ -73,8 +74,7 @@ libext2fs - 1.43.3-2
 libf2fs - 1.8.0-3
 libfdisk - 2.29.2-1
 libgcc - 5.4.0-1
-libip4tc - 1.4.21-2
-libip6tc - 1.4.21-2
+libiw - 29-5
 libiwinfo - 2016-09-21-fd9e17be-1
 libiwinfo-lua - 2016-09-21-fd9e17be-1
 libjson-c - 0.12.1-1
@@ -98,7 +98,6 @@ libuci - 2016-07-04-e1bf4356-1
 libuci-lua - 2016-07-04-e1bf4356-1
 libuclient - 2017-09-06-24d6eded-1
 libuuid - 2.29.2-1
-libxtables - 1.4.21-2
 logd - 2017-03-10-16f7e161-1
 lua - 5.1.5-1
 luci-base - git-17.290.79498-d3f0685-1
