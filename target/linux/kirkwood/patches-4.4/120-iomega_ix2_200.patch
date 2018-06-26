@@ -1,6 +1,7 @@
 --- a/arch/arm/boot/dts/kirkwood-iomega_ix2_200.dts
 +++ b/arch/arm/boot/dts/kirkwood-iomega_ix2_200.dts
-@@ -179,25 +179,25 @@
+@@ -178,26 +178,26 @@
+ &nand {
  	status = "okay";
  
  	partition@0 {
@@ -32,3 +33,20 @@
  	};
  };
  
+
+@@ -212,14 +212,14 @@
+ &eth0 {
+-	status = "okay";
++	status = "disabled";
+ 	ethernet0-port@0 {
+ 		speed = <1000>;
+ 		duplex = <1>;
+ 	};
+ };
+ 
+ &eth1 {
+ 	status = "okay";
+ 	ethernet1-port@0 {
+ 		phy-handle = <&ethphy1>;
+ 	};
+ };
