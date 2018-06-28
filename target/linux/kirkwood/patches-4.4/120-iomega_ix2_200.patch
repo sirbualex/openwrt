@@ -1,52 +1,33 @@
 --- a/arch/arm/boot/dts/kirkwood-iomega_ix2_200.dts
 +++ b/arch/arm/boot/dts/kirkwood-iomega_ix2_200.dts
-@@ -178,26 +178,26 @@
- &nand {
- 	status = "okay";
- 
- 	partition@0 {
--		label = "u-boot";
--		reg = <0x0000000 0x100000>;
-+		label = "u-boot";
-+		reg = <0x0000000 0x100000>;
- 		read-only;
+@@ -185,18 +185,18 @@
  	};
  
  	partition@a0000 {
 -		label = "env";
--		reg = <0xa0000 0x20000>;
 +		label = "u-boot environment";
-+		reg = <0xa0000 0x20000>;
+ 		reg = <0xa0000 0x20000>;
  		read-only;
  	};
  
  	partition@100000 {
- 		label = "uImage";
+-		label = "uImage";
++		label = "kernel";
  		reg = <0x100000 0x300000>;
  	};
  
  	partition@400000 {
 -		label = "rootfs";
--		reg = <0x400000 0x1C00000>;
 +		label = "ubi";
-+		reg = <0x400000 0x1C00000>;
+ 		reg = <0x400000 0x1C00000>;
  	};
  };
+@@ -210,7 +210,7 @@
+ };
  
-
-@@ -212,14 +212,14 @@
  &eth0 {
 -	status = "okay";
 +	status = "disabled";
  	ethernet0-port@0 {
  		speed = <1000>;
  		duplex = <1>;
- 	};
- };
- 
- &eth1 {
- 	status = "okay";
- 	ethernet1-port@0 {
- 		phy-handle = <&ethphy1>;
- 	};
- };

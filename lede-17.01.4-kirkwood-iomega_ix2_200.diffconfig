@@ -39,11 +39,13 @@ CONFIG_PACKAGE_fdisk=y
 CONFIG_PACKAGE_gdisk=y
 CONFIG_PACKAGE_git=y
 CONFIG_PACKAGE_git-http=y
+CONFIG_PACKAGE_hd-idle=y
+CONFIG_PACKAGE_hostapd-common=m
 # CONFIG_PACKAGE_ip6tables is not set
 # CONFIG_PACKAGE_iptables is not set
-CONFIG_PACKAGE_iw=y
+CONFIG_PACKAGE_kmod-ata-core=m
+CONFIG_PACKAGE_kmod-ata-marvell-sata=m
 CONFIG_PACKAGE_kmod-batman-adv=y
-CONFIG_PACKAGE_kmod-cfg80211=y
 CONFIG_PACKAGE_kmod-crypto-aead=y
 CONFIG_PACKAGE_kmod-crypto-crc32c=y
 CONFIG_PACKAGE_kmod-crypto-hash=y
@@ -60,11 +62,9 @@ CONFIG_PACKAGE_kmod-fs-ntfs=y
 CONFIG_PACKAGE_kmod-fs-vfat=y
 CONFIG_PACKAGE_kmod-fs-xfs=y
 CONFIG_PACKAGE_kmod-fuse=y
-CONFIG_PACKAGE_kmod-gpio-button-hotplug=y
 CONFIG_PACKAGE_kmod-hwmon-core=y
 CONFIG_PACKAGE_kmod-hwmon-lm63=y
 CONFIG_PACKAGE_kmod-hwmon-pwmfan=y
-CONFIG_PACKAGE_kmod-i2c-core=y
 CONFIG_PACKAGE_kmod-ip6tables=m
 CONFIG_PACKAGE_kmod-ipt-conntrack=m
 CONFIG_PACKAGE_kmod-ipt-core=m
@@ -80,31 +80,29 @@ CONFIG_PACKAGE_kmod-lib-zlib-deflate=y
 CONFIG_PACKAGE_kmod-lib-zlib-inflate=y
 CONFIG_PACKAGE_kmod-libphy=y
 CONFIG_PACKAGE_kmod-loop=y
+CONFIG_PACKAGE_kmod-mac80211=m
 CONFIG_PACKAGE_kmod-md-mod=y
 CONFIG_PACKAGE_kmod-md-raid0=y
 CONFIG_PACKAGE_kmod-md-raid1=y
+CONFIG_PACKAGE_kmod-mmc=m
+CONFIG_PACKAGE_kmod-mwl8k=m
 CONFIG_PACKAGE_kmod-nf-conntrack=m
 CONFIG_PACKAGE_kmod-nf-conntrack6=m
 CONFIG_PACKAGE_kmod-nf-ipt=m
 CONFIG_PACKAGE_kmod-nf-ipt6=m
 CONFIG_PACKAGE_kmod-nf-nat=m
-CONFIG_PACKAGE_kmod-nls-base=y
 CONFIG_PACKAGE_kmod-nls-cp437=y
 CONFIG_PACKAGE_kmod-nls-iso8859-1=y
 CONFIG_PACKAGE_kmod-nls-utf8=y
 CONFIG_PACKAGE_kmod-ppp=m
 CONFIG_PACKAGE_kmod-pppoe=m
 CONFIG_PACKAGE_kmod-pppox=m
-CONFIG_PACKAGE_kmod-scsi-core=y
 CONFIG_PACKAGE_kmod-scsi-generic=y
 CONFIG_PACKAGE_kmod-slhc=m
 CONFIG_PACKAGE_kmod-swconfig=y
 CONFIG_PACKAGE_kmod-switch-mvsw61xx=y
-CONFIG_PACKAGE_kmod-usb-core=y
 CONFIG_PACKAGE_kmod-usb-ohci=y
-CONFIG_PACKAGE_kmod-usb-storage=y
 # CONFIG_PACKAGE_kmod-usb-storage-extras is not set
-CONFIG_PACKAGE_kmod-usb2=y
 CONFIG_PACKAGE_libattr=y
 CONFIG_PACKAGE_libblkid=y
 CONFIG_PACKAGE_libbz2=y
@@ -113,20 +111,27 @@ CONFIG_PACKAGE_libdevmapper=y
 CONFIG_PACKAGE_libertas-sdio-firmware=y
 CONFIG_PACKAGE_libertas-spi-firmware=y
 CONFIG_PACKAGE_libertas-usb-firmware=y
+CONFIG_PACKAGE_libevent2=y
+CONFIG_PACKAGE_libexif=y
 CONFIG_PACKAGE_libext2fs=y
 CONFIG_PACKAGE_libf2fs=y
 CONFIG_PACKAGE_libfdisk=y
+CONFIG_PACKAGE_libffmpeg-audio-dec=y
+CONFIG_PACKAGE_libflac=y
 CONFIG_PACKAGE_libgcrypt=y
 CONFIG_PACKAGE_libgpg-error=y
+CONFIG_PACKAGE_libid3tag=y
 # CONFIG_PACKAGE_libip4tc is not set
 # CONFIG_PACKAGE_libip6tc is not set
 CONFIG_PACKAGE_libiwinfo=y
 CONFIG_PACKAGE_libiwinfo-lua=y
+CONFIG_PACKAGE_libjpeg=y
 CONFIG_PACKAGE_liblua=y
 CONFIG_PACKAGE_liblzma=y
 CONFIG_PACKAGE_liblzo=y
 CONFIG_PACKAGE_libmbedtls=y
 CONFIG_PACKAGE_libncurses=y
+CONFIG_PACKAGE_libogg=y
 CONFIG_PACKAGE_libopenssl=y
 CONFIG_PACKAGE_libpcre=y
 CONFIG_PACKAGE_libpopt=y
@@ -134,16 +139,21 @@ CONFIG_PACKAGE_libreadline=y
 CONFIG_PACKAGE_librt=y
 CONFIG_PACKAGE_libsensors=y
 CONFIG_PACKAGE_libsmartcols=y
+CONFIG_PACKAGE_libsqlite3=y
 CONFIG_PACKAGE_libstdcpp=y
 CONFIG_PACKAGE_libsysfs=y
 CONFIG_PACKAGE_libubus-lua=y
 CONFIG_PACKAGE_libuci-lua=y
 CONFIG_PACKAGE_libusb-1.0=y
 CONFIG_PACKAGE_libuuid=y
+CONFIG_PACKAGE_libvorbis=y
 # CONFIG_PACKAGE_libxtables is not set
 CONFIG_PACKAGE_lm-sensors=y
 CONFIG_PACKAGE_lm-sensors-detect=y
 CONFIG_PACKAGE_lua=y
+CONFIG_PACKAGE_luci-app-hd-idle=y
+CONFIG_PACKAGE_luci-app-minidlna=y
+CONFIG_PACKAGE_luci-app-samba=y
 CONFIG_PACKAGE_luci-base=y
 CONFIG_PACKAGE_luci-lib-ip=y
 CONFIG_PACKAGE_luci-lib-jsonc=y
@@ -153,10 +163,10 @@ CONFIG_PACKAGE_luci-proto-ipv6=y
 CONFIG_PACKAGE_luci-theme-material=y
 CONFIG_PACKAGE_lvm2=y
 CONFIG_PACKAGE_mdadm=y
+CONFIG_PACKAGE_minidlna=y
 CONFIG_PACKAGE_mkf2fs=y
 CONFIG_PACKAGE_mwifiex-pcie-firmware=y
 CONFIG_PACKAGE_mwifiex-sdio-firmware=y
-CONFIG_PACKAGE_mwl8k-firmware=y
 CONFIG_PACKAGE_nand-utils=y
 CONFIG_PACKAGE_nano=y
 CONFIG_PACKAGE_ntfs-3g=y
@@ -196,12 +206,20 @@ CONFIG_PACKAGE_rsync=y
 CONFIG_PACKAGE_rsyncd=y
 CONFIG_PACKAGE_samba36-client=y
 CONFIG_PACKAGE_samba36-server=y
+CONFIG_PACKAGE_shadow-common=y
+CONFIG_PACKAGE_shadow-groupadd=y
+CONFIG_PACKAGE_shadow-useradd=y
+CONFIG_PACKAGE_shadow-usermod=y
+CONFIG_PACKAGE_shadow-utils=y
 CONFIG_PACKAGE_shellinabox=y
+CONFIG_PACKAGE_sudo=y
+# CONFIG_PACKAGE_swconfig is not set
 CONFIG_PACKAGE_sysfsutils=y
 CONFIG_PACKAGE_tar=y
 CONFIG_PACKAGE_terminfo=y
 CONFIG_PACKAGE_tune2fs=y
 CONFIG_PACKAGE_uhttpd=y
+CONFIG_PACKAGE_uhttpd-mod-lua=y
 CONFIG_PACKAGE_uhttpd-mod-ubus=y
 CONFIG_PACKAGE_usbutils=y
 CONFIG_PACKAGE_wget=y
@@ -216,9 +234,8 @@ CONFIG_PERL_NOCOMMENT=y
 CONFIG_PERL_THREADS=y
 # CONFIG_PER_FEED_REPO_ADD_COMMENTED is not set
 CONFIG_RSYNC_zlib=y
-CONFIG_TARGET_INITRAMFS_COMPRESSION_LZMA=y
 # CONFIG_TARGET_INITRAMFS_COMPRESSION_NONE is not set
-CONFIG_TARGET_ROOTFS_TARGZ=y
+# CONFIG_TARGET_ROOTFS_INITRAMFS is not set
 CONFIG_VERSIONOPT=y
 CONFIG_VERSION_BUG_URL=""
 CONFIG_VERSION_CODE=""
@@ -232,3 +249,19 @@ CONFIG_VERSION_NUMBER=""
 CONFIG_VERSION_PRODUCT=""
 CONFIG_VERSION_REPO="http://downloads.lede-project.org/releases/17.01.4"
 CONFIG_VERSION_SUPPORT_URL=""
+CONFIG_PACKAGE_mwl8k-firmware=y
+# CONFIG_PACKAGE_shadow-chage is not set
+# CONFIG_PACKAGE_shadow-groupdel is not set
+# CONFIG_PACKAGE_shadow-groupmod is not set
+# CONFIG_PACKAGE_shadow-groups is not set
+# CONFIG_PACKAGE_shadow-passwd is not set
+# CONFIG_PACKAGE_shadow-su is not set
+# CONFIG_PACKAGE_shadow-userdel is not set
+# CONFIG_TARGET_INITRAMFS_COMPRESSION_BZIP2 is not set
+# CONFIG_TARGET_INITRAMFS_COMPRESSION_GZIP is not set
+# CONFIG_TARGET_INITRAMFS_COMPRESSION_LZ4 is not set
+# CONFIG_TARGET_INITRAMFS_COMPRESSION_LZMA is not set
+# CONFIG_TARGET_INITRAMFS_COMPRESSION_LZO is not set
+# CONFIG_TARGET_INITRAMFS_COMPRESSION_NONE is not set
+# CONFIG_TARGET_INITRAMFS_COMPRESSION_XZ is not set
+# CONFIG_shadow-all is not set

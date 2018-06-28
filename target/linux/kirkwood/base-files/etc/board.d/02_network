@@ -17,6 +17,7 @@ case "$board" in
 "goflexnet"|\
 "ib62x0"|\
 "iconnect"|\
+"iomega_ix2_200"|"iom,ix2-200"|\
 "nsa310s"|\
 "pogo_e02"|\
 "sheevaplug"|\
@@ -30,9 +31,6 @@ case "$board" in
 	;;
 "guruplug-server-plus")
 	ucidef_set_interface_lan "eth0 eth1" "dhcp"
-	;;
-"iomega_ix2_200"|"iom,ix2-200")
-	ucidef_set_interface_lan "eth1" "dhcp"
 	;;
 *)
 	ucidef_set_interface_lan "eth0"

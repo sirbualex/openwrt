@@ -71,6 +71,17 @@ CONFIG_DEFAULT_firewall=y
 CONFIG_DEFAULT_fstools=y
 CONFIG_DEFAULT_ip6tables=y
 CONFIG_DEFAULT_iptables=y
+CONFIG_DEFAULT_kmod-ata-core=y
+CONFIG_DEFAULT_kmod-ata-marvell-sata=y
+CONFIG_DEFAULT_kmod-gpio-button-hotplug=y
+CONFIG_DEFAULT_kmod-i2c-core=y
+CONFIG_DEFAULT_kmod-i2c-mv64xxx=y
+CONFIG_DEFAULT_kmod-mmc=y
+CONFIG_DEFAULT_kmod-mvsdio=y
+CONFIG_DEFAULT_kmod-mwl8k=y
+CONFIG_DEFAULT_kmod-thermal-kirkwood=y
+CONFIG_DEFAULT_kmod-usb-storage=y
+CONFIG_DEFAULT_kmod-usb2=y
 CONFIG_DEFAULT_libc=y
 CONFIG_DEFAULT_libgcc=y
 CONFIG_DEFAULT_logd=y
@@ -81,6 +92,7 @@ CONFIG_DEFAULT_odhcpd=y
 CONFIG_DEFAULT_opkg=y
 CONFIG_DEFAULT_ppp=y
 CONFIG_DEFAULT_ppp-mod-pppoe=y
+CONFIG_DEFAULT_swconfig=y
 CONFIG_DEFAULT_uboot-envtools=y
 CONFIG_DEFAULT_uci=y
 CONFIG_DEFAULT_uclient-fetch=y
@@ -113,7 +125,7 @@ CONFIG_EXTERNAL_CPIO=""
 # Root filesystem archives
 #
 # CONFIG_TARGET_ROOTFS_CPIOGZ is not set
-CONFIG_TARGET_ROOTFS_TARGZ=y
+# CONFIG_TARGET_ROOTFS_TARGZ is not set
 
 #
 # Root filesystem images
@@ -275,17 +287,11 @@ CONFIG_SOFT_FLOAT=y
 CONFIG_NEED_TOOLCHAIN=y
 # CONFIG_TOOLCHAINOPTS is not set
 # CONFIG_EXTRA_TARGET_ARCH is not set
-# CONFIG_BINUTILS_USE_VERSION_2_25_1 is not set
-# CONFIG_BINUTILS_USE_VERSION_2_27 is not set
 CONFIG_EXTRA_BINUTILS_CONFIG_OPTIONS=""
-# CONFIG_GCC_USE_VERSION_5 is not set
-# CONFIG_GCC_USE_VERSION_6 is not set
 CONFIG_EXTRA_GCC_CONFIG_OPTIONS=""
 # CONFIG_SJLJ_EXCEPTIONS is not set
 # CONFIG_INSTALL_LIBGCJ is not set
 # CONFIG_INSTALL_GFORTRAN is not set
-# CONFIG_LIBC_USE_GLIBC is not set
-# CONFIG_LIBC_USE_MUSL is not set
 CONFIG_GDB=y
 # CONFIG_INSIGHT is not set
 CONFIG_USE_MUSL=y
@@ -3354,7 +3360,7 @@ CONFIG_PACKAGE_luci-app-samba=y
 # CONFIG_PACKAGE_luci-app-squid is not set
 # CONFIG_PACKAGE_luci-app-statistics is not set
 # CONFIG_PACKAGE_luci-app-tinyproxy is not set
-CONFIG_PACKAGE_luci-app-transmission=y
+# CONFIG_PACKAGE_luci-app-transmission is not set
 # CONFIG_PACKAGE_luci-app-travelmate is not set
 # CONFIG_PACKAGE_luci-app-udpxy is not set
 # CONFIG_PACKAGE_luci-app-uhttpd is not set
@@ -3507,31 +3513,6 @@ CONFIG_PACKAGE_luci-lib-nixio=y
 # CONFIG_PACKAGE_luci-i18n-samba-vi is not set
 # CONFIG_PACKAGE_luci-i18n-samba-zh-cn is not set
 # CONFIG_PACKAGE_luci-i18n-samba-zh-tw is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-ca is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-cs is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-de is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-el is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-en is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-es is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-fr is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-he is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-hu is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-it is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-ja is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-ms is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-no is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-pl is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-pt is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-pt-br is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-ro is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-ru is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-sk is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-sv is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-tr is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-uk is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-vi is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-zh-cn is not set
-# CONFIG_PACKAGE_luci-i18n-transmission-zh-tw is not set
 
 #
 # Mail
@@ -3607,12 +3588,11 @@ CONFIG_PACKAGE_minidlna=y
 # CONFIG_PACKAGE_rtorrent is not set
 # CONFIG_PACKAGE_rtorrent-rpc is not set
 # CONFIG_PACKAGE_transmission-cli-mbedtls is not set
-CONFIG_PACKAGE_transmission-cli-openssl=y
+# CONFIG_PACKAGE_transmission-cli-openssl is not set
 # CONFIG_PACKAGE_transmission-daemon-mbedtls is not set
-CONFIG_PACKAGE_transmission-daemon-openssl=y
+# CONFIG_PACKAGE_transmission-daemon-openssl is not set
 # CONFIG_PACKAGE_transmission-remote-mbedtls is not set
-CONFIG_PACKAGE_transmission-remote-openssl=y
-CONFIG_PACKAGE_transmission-web=y
+# CONFIG_PACKAGE_transmission-remote-openssl is not set
 
 #
 # Captive Portals
@@ -4047,7 +4027,7 @@ CONFIG_PACKAGE_uqmi=m
 # CONFIG_PACKAGE_tinyproxy is not set
 CONFIG_PACKAGE_uhttpd=y
 # CONFIG_PACKAGE_uhttpd_debug is not set
-# CONFIG_PACKAGE_uhttpd-mod-lua is not set
+CONFIG_PACKAGE_uhttpd-mod-lua=y
 CONFIG_PACKAGE_uhttpd-mod-ubus=y
 
 #

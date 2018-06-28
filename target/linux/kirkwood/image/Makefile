@@ -81,20 +81,22 @@ $(Device/dockstar)
 endef
 
 define Device/iomega_ix2_200
-  DEVICE_TITLE := Iomega StorCenter ix2-200
-  # TODO: Select Packages
-  #DEVICE_PACKAGES := kmod-mwl8k swconfig kmod-gpio-button-hotplug
+  DEVICE_PACKAGES := kmod-mwl8k swconfig kmod-gpio-button-hotplug kmod-ata-core kmod-ata-marvell-sata kmod-usb2 kmod-usb-storage \
+  		     kmod-mmc kmod-mvsdio kmod-i2c-core kmod-i2c-mv64xxx kmod-thermal-kirkwood 
   DEVICE_DTS := kirkwood-iomega_ix2_200
-  KERNEL_SIZE := 3072k
-  FILESYSTEMS := squashfs ubifs
-  IMAGES := sysupgrade.tar sysupgrade.bin factory.bin rootfs.ubi
+  FILESYSTEMS := squashfs
+  IMAGE_SIZE := 29360128
+  IMAGES := sysupgrade.tar rootfs.ubi
   IMAGE/sysupgrade.tar := sysupgrade-tar
-  IMAGE/rootfs.ubi := append-ubi
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  IMAGE/rootfs.ubi := append-ubi | check-size $$$$(IMAGE_SIZE)
+  UBIFS_OPTS:= -m 512 -e 15872 -c 2048
+  UBI_OPTS:= -m 512 -p 16384 -s 256
+  PAGESIZE := 512
+  SUBPAGESIZE := 256
+  BLOCKSIZE := 16KiB
   KERNEL_IN_UBI := 0
   UBINIZE_OPTS := -E 5  
-  IMAGE_SIZE := 32505856
-  IMAGE/factory.bin := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | check-size $$$$(IMAGE_SIZE)
+  DEVICE_TITLE := Iomega StorCenter ix2-200
   BOARD_NAME := iomega_ix2_200
   SUPPORTED_DEVICES += iomega_ix2_200 iom,ix2-200
 endef
