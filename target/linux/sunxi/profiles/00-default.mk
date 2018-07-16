@@ -13,6 +13,7 @@ define Profile/Default
 	kmod-brcmfmac \
 	kmod-rtc-sunxi \
 	kmod-rtl8192cu \
+	kmod-rtl8189fs \
 	kmod-rtl8xxxu \
 	kmod-sun4i-emac \
 	rtl8188eu-firmware \

@@ -8,7 +8,8 @@
 board_config_update
 
 case "$(board_name)" in
-"olimex,a20-olinuxino-micro")
+"olimex,a20-olinuxino-micro"|\
+"xunlong,orangepi-lite")
 	ucidef_set_interface_lan 'wlan0'
 	;;
 "lamobo,lamobo-r1")

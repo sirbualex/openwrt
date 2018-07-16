@@ -138,6 +138,15 @@ endef
 
 TARGET_DEVICES += sun8i-h3-nanopi-neo
 
+define Device/sun8i-h3-orangepi-lite
+  DEVICE_TITLE:=Xunlong Orange Pi Lite
+  DEVICE_PACKAGES:=kmod-rtc-sunxi kmod-gpio-button-hotplug wpad-mini kmod-rtl8189fs
+  DEVICE_TYPE:=nas
+  SUPPORTED_DEVICES:=xunlong,orangepi-lite
+  SUNXI_DTS:=sun8i-h3-orangepi-lite
+endef
+
+TARGET_DEVICES += sun8i-h3-orangepi-lite
 
 define Device/sun8i-h3-orangepi-pc
   DEVICE_TITLE:=Xunlong Orange Pi PC
