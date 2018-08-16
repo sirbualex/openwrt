@@ -1,0 +1,398 @@
+--- a/block.c
++++ b/block.c
+@@ -48,6 +48,7 @@
+ #include "probe.h"
+ 
+ #define AUTOFS_MOUNT_PATH       "/tmp/run/blockd/"
++#define SUBV_BUF_LENGTH 256
+ 
+ #ifdef UBIFS_EXTROOT
+ #include "libubi/libubi.h"
+@@ -81,6 +82,8 @@ struct mount {
+ 	int disabled_fsck;
+ 	unsigned int prio;
+ 	int btrfs_raid;
++
++	struct vlist_tree submounts;
+ };
+ 
+ static struct vlist_tree mounts;
+@@ -195,6 +198,8 @@ static const struct mount_flag mount_fla
+ 	{ "user_xattr",		~MS_NOUSER	},
+ };
+ 
++static struct probe_info* find_block_info(char *uuid, char *label, char *path);
++
+ static char *blobmsg_get_strdup(struct blob_attr *attr)
+ {
+ 	if (!attr)
+@@ -257,6 +262,37 @@ static void parse_mount_options(struct m
+ 	free(optstr);
+ }
+ 
++static char *get_mount_option(struct mount *m, const char *option, char buf[], int len)
++{
++	char *start = NULL, *end = NULL;
++
++	buf[0] = '\0';
++	start = strstr(m->options, option);
++	if(start)
++		end = strstr(start, ",");
++	if(end) {
++		if(len > (strlen(start)-strlen(end))) {
++			strncpy(buf, start, (strlen(start)-strlen(end)));
++			buf[strlen(start)-strlen(end)] = '\0';
++		} else {
++			buf = NULL;
++		}
++	} else if (start) {
++		if(len > strlen(start)) {
++			strncpy(buf, start, strlen(start));
++			buf[strlen(start)] = '\0';
++		} else {
++			buf = NULL;
++		}
++	}
++	return buf;
++}
++
++static void mounts_update(struct vlist_tree *tree, struct vlist_node *node_new,
++			  struct vlist_node *node_old)
++{
++}
++
+ static int mount_add(struct uci_section *s)
+ {
+ 	struct blob_attr *tb[__MOUNT_MAX] = { 0 };
+@@ -302,12 +338,38 @@ static int mount_add(struct uci_section
+ 		return -1;
+ 	}
+ 
+-	if (m->uuid)
+-		vlist_add(&mounts, &m->node, m->uuid);
+-	else if (m->label)
+-		vlist_add(&mounts, &m->node, m->label);
+-	else if (m->device)
+-		vlist_add(&mounts, &m->node, m->device);
++	// get appropiate vlist key
++	char *vlist_key = NULL;
++	if(m->uuid) {
++		vlist_key = m->uuid;
++	} else if(m->label) {
++		vlist_key = m->label;
++	} else if(m->device) {
++		vlist_key = m->device;
++	}
++
++	// get vlist entry with key
++	struct mount *em = NULL;
++	em = vlist_find(&mounts, vlist_key, em, node);
++
++	char buf_em_svolid[SUBV_BUF_LENGTH] ={0}, buf_em_svol[SUBV_BUF_LENGTH] = {0},
++	     buf_m_svolid[SUBV_BUF_LENGTH] = {0}, buf_m_svol[SUBV_BUF_LENGTH] = {0};
++
++	// initialize submounts vlist in mount
++	vlist_init(&m->submounts, avl_strcmp, mounts_update);
++
++	// check if entry already exists and compare mount options, in this case special to btrfs
++	if(em &&
++		(strcmp(get_mount_option(em, "subvol", buf_em_svol, SUBV_BUF_LENGTH),
++			get_mount_option(m, "subvol", buf_m_svol, SUBV_BUF_LENGTH)) ||
++		strcmp(get_mount_option(em, "subvolid", buf_em_svolid, SUBV_BUF_LENGTH),
++			get_mount_option(m, "subvolid", buf_m_svolid, SUBV_BUF_LENGTH))) ) {
++		// mount different related to compared mount options, add it possibly as submount
++		vlist_add(&em->submounts, &m->node,
++				strndup((buf_m_svol != NULL ? buf_m_svol : buf_m_svolid), SUBV_BUF_LENGTH));
++	} else {
++		vlist_add(&mounts, &m->node, vlist_key);
++	}
+ 
+ 	return 0;
+ }
+@@ -417,11 +479,6 @@ static struct mount* find_block(const ch
+ 	return NULL;
+ }
+ 
+-static void mounts_update(struct vlist_tree *tree, struct vlist_node *node_new,
+-			  struct vlist_node *node_old)
+-{
+-}
+-
+ static struct uci_package * config_try_load(struct uci_context *ctx, char *path)
+ {
+ 	char *file = basename(path);
+@@ -583,12 +640,13 @@ static struct probe_info* find_block_inf
+ 	return NULL;
+ }
+ 
+-static char* find_mount_point(char *block)
++static char* find_mount_point(char *block, char *option)
+ {
+ 	FILE *fp = fopen("/proc/self/mountinfo", "r");
+ 	static char line[256];
+ 	int len = strlen(block);
+ 	char *point = NULL, *pos, *tmp, *cpoint, *devname;
++	char options[256] = {0}, op[SUBV_BUF_LENGTH] = {0}, *op_s = NULL, *op_e = NULL;
+ 	struct stat s;
+ 	int rstat;
+ 	unsigned int minor, major;
+@@ -597,8 +655,25 @@ static char* find_mount_point(char *bloc
+ 		return NULL;
+ 
+ 	rstat = stat(block, &s);
+-
+ 	while (fgets(line, sizeof(line), fp)) {
++		//start of option find
++		if(option) {
++			op[0] = '\0';
++			if( sscanf(line, "%*s %*s %*s %*s %*s %*s - %*s %*s %256s", options) ) {
++				op_s = strstr(options, option);
++				if(op_s) {
++					op_e = strstr(op_s, ",");
++					if( op_e && (SUBV_BUF_LENGTH > (strlen(op_s)-strlen(op_e))) ) {
++						strncpy(op, op_s, (strlen(op_s)-strlen(op_e)));
++						op[strlen(op_s)-strlen(op_e)] = '\0';
++					} else if( op_s && ((SUBV_BUF_LENGTH > strlen(op_s))) ) {
++						strncpy(op, op_s, strlen(op_s));
++						op[strlen(op_s)] = '\0';
++					}
++				}
++			}
++		}
++		//end of option find
+ 		pos = strchr(line, ' ');
+ 		if (!pos)
+ 			continue;
+@@ -652,8 +727,10 @@ static char* find_mount_point(char *bloc
+ 		*pos = '\0';
+ 		devname = tmp;
+ 		if (!strncmp(block, devname, len)) {
+-			point = strdup(cpoint);
+-			break;
++			if(!option || (option && !strcmp(option, op))) {
++				point = strdup(cpoint);
++				break;
++			}
+ 		}
+ 
+ 		if (rstat)
+@@ -664,8 +741,10 @@ static char* find_mount_point(char *bloc
+ 
+ 		if (major == major(s.st_rdev) &&
+ 		    minor == minor(s.st_rdev)) {
+-			point = strdup(cpoint);
+-			break;
++			if(!option || (option && !strcmp(option, op))) {
++				point = strdup(cpoint);
++				break;
++			}
+ 		}
+ 	}
+ 
+@@ -678,7 +757,7 @@ static int print_block_info(struct probe
+ {
+ 	static char *mp;
+ 
+-	mp = find_mount_point(pr->dev);
++	mp = find_mount_point(pr->dev, NULL);
+ 	printf("%s:", pr->dev);
+ 	if (pr->uuid)
+ 		printf(" UUID=\"%s\"", pr->uuid);
+@@ -1103,11 +1182,12 @@ static void blockd_notify(char *device,
+ 	ubus_free(ctx);
+ }
+ 
+-static int mount_device(struct probe_info *pr, int type)
++static int mount_device(struct probe_info *pr, int type, struct mount *subm)
+ {
+ 	struct mount *m;
+ 	char *device;
+ 	char *mp;
++	int err = 0;
+ 
+ 	if (!pr)
+ 		return -1;
+@@ -1124,14 +1204,38 @@ static int mount_device(struct probe_inf
+ 		return 0;
+ 	}
+ 
+-	mp = find_mount_point(pr->dev);
+-	if (mp && (type != TYPE_HOTPLUG)) {
+-		ULOG_ERR("%s is already mounted on %s\n", pr->dev, mp);
+-		free(mp);
+-		return -1;
++	if(!strcmp(pr->type, "btrfs")) {
++		if(subm) {
++			m = subm;
++		} else {
++			m = find_block(pr->uuid, pr->label, device, NULL);
++		}
++		char buf_m_subvol[SUBV_BUF_LENGTH] = {0}, buf_m_subvolid[SUBV_BUF_LENGTH] = {0};
++		if(m) {
++			get_mount_option(m, "subvol", buf_m_subvol, SUBV_BUF_LENGTH);
++			get_mount_option(m, "subvolid", buf_m_subvolid, SUBV_BUF_LENGTH);
++		}
++		mp = find_mount_point(pr->dev, (buf_m_subvol != NULL ? buf_m_subvol : buf_m_subvolid));
++		if(mp && (type != TYPE_HOTPLUG)) {
++			ULOG_ERR("%s (btrfs: %s) is already mounted on %s\n", pr->dev,
++				(buf_m_subvol != NULL ? buf_m_subvol : buf_m_subvolid),
++				mp);
++			free(mp);
++			if(avl_is_empty(&m->submounts.avl)) {
++				return -1;
++			}
++			goto submounts;
++		}
++	} else {
++		mp = find_mount_point(pr->dev, NULL);
++		if (mp && (type != TYPE_HOTPLUG)) {
++			ULOG_ERR("%s is already mounted on %s\n", pr->dev, mp);
++			free(mp);
++			return -1;
++		}
++		m = find_block(pr->uuid, pr->label, device, NULL);
+ 	}
+ 
+-	m = find_block(pr->uuid, pr->label, device, NULL);
+ 	if (m && m->extroot)
+ 		return -1;
+ 
+@@ -1158,7 +1262,6 @@ static int mount_device(struct probe_inf
+ 	if (m) {
+ 		char *target = m->target;
+ 		char _target[32];
+-		int err = 0;
+ 
+ 		if (m->autofs) {
+ 			snprintf(_target, sizeof(_target), "/tmp/run/blockd/%s", device);
+@@ -1176,15 +1279,25 @@ static int mount_device(struct probe_inf
+ 		err = handle_mount(pr->dev, target, pr->type, m);
+ 		if (err)
+ 			ULOG_ERR("mounting %s (%s) as %s failed (%d) - %m\n",
+-			         pr->dev, pr->type, target, errno);
++		         	pr->dev, pr->type, target, errno);
+ 		else
+ 			handle_swapfiles(true);
++submounts:
++		if(!avl_is_empty(&m->submounts.avl)) {
++			struct mount *submount;
++			vlist_for_each_element(&m->submounts, submount, node) {
++				/*if(mount_device(pr, type, submount) < 0) {
++					return -1;
++				}*/
++				mount_device(pr, type, submount);
++			}
++		}
++
+ 		return err;
+ 	}
+ 
+ 	if (anon_mount) {
+ 		char target[32];
+-		int err = 0;
+ 
+ 		snprintf(target, sizeof(target), "/mnt/%s", device);
+ 		mkdir_p(target);
+@@ -1204,7 +1317,7 @@ static int mount_device(struct probe_inf
+ 	return 0;
+ }
+ 
+-static int umount_device(struct probe_info *pr)
++static int umount_device(struct probe_info *pr, struct mount *subm)
+ {
+ 	struct mount *m;
+ 	char *device = basename(pr->dev);
+@@ -1217,13 +1330,37 @@ static int umount_device(struct probe_in
+ 	if (!strcmp(pr->type, "swap"))
+ 		return -1;
+ 
+-	mp = find_mount_point(pr->dev);
+-	if (!mp)
++	if(!strcmp(pr->type, "btrfs")) {
++		if(subm) {
++			m = subm;
++		} else {
++			m = find_block(pr->uuid, pr->label, device, NULL);
++		}
++		char buf_m_subvol[SUBV_BUF_LENGTH] = {0}, buf_m_subvolid[SUBV_BUF_LENGTH] = {0};
++		if(m) {
++			get_mount_option(m, "subvol", buf_m_subvol, SUBV_BUF_LENGTH);
++			get_mount_option(m, "subvolid", buf_m_subvolid, SUBV_BUF_LENGTH);
++		}
++		mp = find_mount_point(pr->dev, (buf_m_subvol != NULL ? buf_m_subvol : buf_m_subvolid));
++	} else {
++		mp = find_mount_point(pr->dev, NULL);
++		m = find_block(pr->uuid, pr->label, device, NULL);
++	}
++
++	if(m && !avl_is_empty(&m->submounts.avl)) {
++		struct mount *submount;
++		vlist_for_each_element(&m->submounts, submount, node) {
++			umount_device(pr, submount);
++		}
++	}
++
++	if(!mp)
+ 		return -1;
+ 
+-	m = find_block(pr->uuid, pr->label, device, NULL);
+-	if (m && m->extroot)
++	if (m && m->extroot) {
++		free(mp);
+ 		return -1;
++	}
+ 
+ 	err = umount2(mp, MNT_DETACH);
+ 	if (err)
+@@ -1252,7 +1389,7 @@ static int mount_action(char *action, ch
+ 		if (type == TYPE_HOTPLUG)
+ 			blockd_notify(device, NULL, NULL);
+ 
+-		mount_point = find_mount_point(path);
++		mount_point = find_mount_point(path, NULL);
+ 		if (mount_point)
+ 			err = umount2(mount_point, MNT_DETACH);
+ 
+@@ -1272,7 +1409,7 @@ static int mount_action(char *action, ch
+ 		return -1;
+ 	cache_load(0);
+ 
+-	return mount_device(find_block_info(NULL, NULL, path), type);
++	return mount_device(find_block_info(NULL, NULL, path), type, NULL);
+ }
+ 
+ static int main_hotplug(int argc, char **argv)
+@@ -1296,7 +1433,7 @@ static int main_autofs(int argc, char **
+ 			struct mount *m = find_block(pr->uuid, pr->label, NULL, NULL);
+ 
+ 			if (m && m->autofs)
+-				mount_device(pr, TYPE_HOTPLUG);
++				mount_device(pr, TYPE_HOTPLUG, NULL);
+ 			else
+ 				blockd_notify(pr->dev, m, pr);
+ 		}
+@@ -1685,13 +1822,12 @@ static int main_extroot(int argc, char *
+ static int main_mount(int argc, char **argv)
+ {
+ 	struct probe_info *pr;
+-
+ 	if (config_load(NULL))
+ 		return -1;
+-
+ 	cache_load(1);
++
+ 	list_for_each_entry(pr, &devices, list)
+-		mount_device(pr, TYPE_DEV);
++		mount_device(pr, TYPE_DEV, NULL);
+ 
+ 	handle_swapfiles(true);
+ 
+@@ -1709,7 +1845,7 @@ static int main_umount(int argc, char **
+ 
+ 	cache_load(0);
+ 	list_for_each_entry(pr, &devices, list)
+-		umount_device(pr);
++		umount_device(pr, NULL);
+ 
+ 	return 0;
+ }

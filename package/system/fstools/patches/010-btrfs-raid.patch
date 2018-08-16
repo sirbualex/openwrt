@@ -1,0 +1,176 @@
+--- a/block.c
++++ b/block.c
+@@ -80,6 +80,7 @@ struct mount {
+ 	int overlay;
+ 	int disabled_fsck;
+ 	unsigned int prio;
++	int btrfs_raid;
+ };
+ 
+ static struct vlist_tree mounts;
+@@ -115,6 +116,7 @@ enum {
+ 	MOUNT_DEVICE,
+ 	MOUNT_OPTIONS,
+ 	MOUNT_AUTOFS,
++	MOUNT_BTRFS_RAID,
+ 	__MOUNT_MAX
+ };
+ 
+@@ -131,6 +133,7 @@ static const struct blobmsg_policy mount
+ 	[MOUNT_OPTIONS] = { .name = "options", .type = BLOBMSG_TYPE_STRING },
+ 	[MOUNT_ENABLE] = { .name = "enabled", .type = BLOBMSG_TYPE_INT32 },
+ 	[MOUNT_AUTOFS] = { .name = "autofs", .type = BLOBMSG_TYPE_INT32 },
++	[MOUNT_BTRFS_RAID] = { .name = "btrfs_raid", .type = BLOBMSG_TYPE_INT32 },
+ };
+ 
+ static const struct uci_blob_param_list mount_attr_list = {
+@@ -279,6 +282,11 @@ static int mount_add(struct uci_section
+ 		m->autofs = blobmsg_get_u32(tb[MOUNT_AUTOFS]);
+ 	else
+ 		m->autofs = 0;
++	if (tb[MOUNT_BTRFS_RAID])
++		m->btrfs_raid = blobmsg_get_u32(tb[MOUNT_BTRFS_RAID]);
++	else
++		m->btrfs_raid = 0;
++
+ 	parse_mount_options(m, blobmsg_get_strdup(tb[MOUNT_OPTIONS]));
+ 
+ 	m->overlay = m->extroot = 0;
+@@ -703,6 +711,120 @@ static void mkdir_p(char *dir)
+ 	}
+ }
+ 
++static void btrfs_device_scan(struct probe_info *pr)
++{
++	struct stat statbuf;
++	const char *btrfs_binary = "/usr/bin/btrfs";
++	const char *btrfs_control = "/dev/btrfs-control";
++	char btrfs_dev_scan_cmd[64];
++
++	int status;
++	FILE *fp;
++	char buf[128];
++
++	ULOG_INFO("btrfs_device_scan: scanning devices for a btrfs filesystem\n");
++
++	snprintf(btrfs_dev_scan_cmd, sizeof(btrfs_dev_scan_cmd), "%s %s", btrfs_binary, "device scan");
++
++	if(pr != NULL) {
++		//only if btrfs probe
++		if (!strncmp(pr->type, "btrfs", 5)) {
++			snprintf(btrfs_dev_scan_cmd, sizeof(btrfs_dev_scan_cmd), "%s %s %s", btrfs_binary, "device scan", pr->dev);
++		} else {
++			ULOG_ERR("btrfs_device_scan: %s is not a BTRFS device", pr->dev);
++			return;
++		}
++	} 
++
++	ULOG_INFO("btrfs_device_scan: preparation for performing scan\n");
++
++	if(stat(btrfs_control, &statbuf) < 0) {
++		ULOG_ERR("btrfs_device_scan: %s not found\n", btrfs_control);
++		//create special character device for btrfs device scan to work
++		unsigned int mode = 0600 | S_IFCHR;
++		if(mknod(btrfs_control, mode, makedev(10,234)) < 0) {
++			ULOG_ERR("btrfs_device_scan: %s could not be created - 'mknod' errno: %d\n", btrfs_control, errno);
++			return;
++		} else {
++			ULOG_INFO("btrfs_device_scan: %s created - necessary for 'btrfs device scan' to work\n", btrfs_control);
++		}
++	} else if(statbuf.st_mode != S_IFCHR) {
++		ULOG_ERR("btrfs_device_scan: %s available, but no character device as needed\n", btrfs_control);
++		return;
++	}
++
++	if (stat(btrfs_binary, &statbuf) < 0) {
++		ULOG_ERR("btrfs_device_scan: %s not found\n", btrfs_binary);
++		return;
++	}
++
++	ULOG_INFO("btrfs_device_scan: '%s'\n", btrfs_dev_scan_cmd);
++
++	if((fp = popen(btrfs_dev_scan_cmd, "r")) == NULL) {
++		ULOG_ERR("btrfs_device_scan: error in 'popen'- errno %d\n", errno);
++		//return -1;
++		return;
++	}
++	while (fgets(buf, sizeof(buf), fp) != NULL) {
++		ULOG_INFO("btrfs_device_scan: %s", buf);
++	}
++	if((status = pclose(fp))) {
++		if(WIFEXITED(status)) {
++			ULOG_ERR("btrfs_device_scan: command not found or exited with error: %d / errno: %d\n", WEXITSTATUS(status), errno);
++			//return -1;
++			return;
++		}
++	}
++}
++
++static void btrfs_filesystem_show(struct probe_info *pr)
++{
++	struct stat statbuf;
++	const char *btrfs_binary = "/usr/bin/btrfs";
++	char btrfs_fi_show_cmd[64];
++
++	int status;
++	FILE *fp;
++	char buf[128];
++
++	ULOG_INFO("btrfs_filesystem_show: show BTRFS filesystem structure\n");
++
++	snprintf(btrfs_fi_show_cmd, sizeof(btrfs_fi_show_cmd), "%s %s", btrfs_binary, "filesystem show");
++
++	if(pr != NULL) {
++		//only if btrfs probe
++		if (!strncmp(pr->type, "btrfs", 5)) {
++			snprintf(btrfs_fi_show_cmd, sizeof(btrfs_fi_show_cmd), "%s %s %s", btrfs_binary, "filesystem show", pr->dev);
++		} else {
++			ULOG_ERR("btrfs_filesystem_show: %s is not a BTRFS device", pr->dev);
++			return;
++		}
++	}
++
++	if (stat(btrfs_binary, &statbuf) < 0) {
++		ULOG_ERR("btrfs_filesystem_show: %s not found\n", btrfs_binary);
++		return;
++	}
++
++	ULOG_INFO("btrfs_filesystem_show: '%s'\n", btrfs_fi_show_cmd);
++
++	if((fp =popen(btrfs_fi_show_cmd, "r")) == NULL) {
++		ULOG_ERR("btrfs_filesystem_show: error in 'popen'- errno %d\n", errno);
++		//return -1;
++		return;
++	}
++	while (fgets(buf, sizeof(buf), fp) != NULL) {
++		ULOG_INFO("btrfs_filesystem_show: %s", buf);
++	}
++	if((status = pclose(fp))) {
++		if(WIFEXITED(status)) {
++			ULOG_ERR("btrfs_filesystem_show: command not found or exited with error: %d / errno: %d\n", WEXITSTATUS(status), errno);
++			//return -1;
++			return;
++		}
++	}
++}
++
+ static void check_filesystem(struct probe_info *pr)
+ {
+ 	pid_t pid;
+@@ -1451,6 +1573,16 @@ static int mount_extroot(char *cfg)
+ 			path = overlay;
+ 		mkdir_p(path);
+ 
++		if (!strncmp(pr->type, "btrfs", 5) && m->btrfs_raid) {
++			ULOG_INFO("extroot: BTRFS raid configuration detected\n");
++			ULOG_INFO("extroot: BTRFS device scan and detected filesystem overview for extroot\n");
++			btrfs_device_scan(NULL);
++			btrfs_filesystem_show(pr);
++			ULOG_INFO("extroot: BTRFS raid configuration ready\n");
++			ULOG_INFO("extroot: BTRFS mount options - '%s'\n", m->options);
++			ULOG_INFO("extroot: BTRFS device used for mount - %s\n", pr->dev);
++		}
++
+ 		if (check_fs)
+ 			check_filesystem(pr);
+ 
